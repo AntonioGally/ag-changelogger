@@ -2,6 +2,10 @@ name: Update change log
 
 on:
   workflow_call:
+    inputs:
+      changelog-path:
+        required: true
+        type: string
 
 jobs:
   update_change_log:

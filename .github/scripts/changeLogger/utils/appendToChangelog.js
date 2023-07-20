@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path');
+const { execSync } = require('child_process');
 
 function generateDate() {
     const date = new Date();
@@ -21,13 +21,9 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName) {
+async function appendToChangelog(prData, tagName, changelogPath) {
 
     const logInfo = createLog(prData, tagName);
-
-    const currentWorkingDir = process.cwd();
-
-    const changelogPath = path.join(currentWorkingDir, 'CHANGELOG.md');
 
     // Check if the file exists
     fs.access(changelogPath, fs.constants.F_OK, (err) => {

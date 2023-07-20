@@ -9,6 +9,7 @@ const { appendToChangelog } = require('./utils/appendToChangelog');
 
 async function main() {
     const context = github.context;
+    const changelogPath = context.inputs["changelog-path"]
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const prNumber = context.payload.pull_request.number;
@@ -18,7 +19,7 @@ async function main() {
     const prData = await getPRInformation(octokit, prNumber, owner, repo);
     const nextVersion = await getNewTagVersion(prData.title, octokit, owner, repo);
 
-    appendToChangelog(prData, nextVersion);
+    appendToChangelog(prData, nextVersion, changelogPath);
 }
 
 main();
