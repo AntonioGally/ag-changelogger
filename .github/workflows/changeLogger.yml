@@ -1,0 +1,23 @@
+name: Update change log
+
+on:
+  workflow_call:
+
+jobs:
+  update_change_log:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: |
+          cd .github/scripts
+          npm install @actions/github @octokit/core child_process
+      - name: Process PR
+        run: node .github/scripts/changeLogger/changeLogger.js
