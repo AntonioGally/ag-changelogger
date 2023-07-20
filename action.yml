@@ -5,7 +5,7 @@ inputs:
     description: "Path to your changelog file"
     required: true
     default: "./CHANGELOG.md"
-  
+
 runs:
   using: "node16"
   main: "./dist/index.js"

@@ -9620,6 +9620,7 @@ function wrappy (fn, cb) {
 
 const fs = __nccwpck_require__(7147);
 const { execSync } = __nccwpck_require__(2081);
+const path = __nccwpck_require__(1017);
 
 function generateDate() {
     const date = new Date();
@@ -9641,9 +9642,15 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName, changelogPath) {
+async function appendToChangelog(prData, tagName, changelogRelativePath) {
 
     const logInfo = createLog(prData, tagName);
+
+    const currentWorkingDir = process.cwd();
+
+    const changelogPath = path.join(currentWorkingDir, changelogRelativePath);
+
+    console.log({ currentWorkingDir, changelogPath })
 
     // Check if the file exists
     fs.access(changelogPath, fs.constants.F_OK, (err) => {
