@@ -1,6 +1,7 @@
 //Libs
 const github = require('@actions/github');
 const { Octokit } = require("@octokit/core");
+const core = require('@actions/core');
 //Scripts
 const { getPRInformation } = require('./utils/getPRInformation');
 const { getNewTagVersion } = require('./utils/getLatestTag');
@@ -9,7 +10,7 @@ const { appendToChangelog } = require('./utils/appendToChangelog');
 
 async function main() {
     const context = github.context;
-    const changelogPath = context.inputs.changelogPath;
+    const changelogPath = core.getInput("changelogPath");
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const prNumber = context.payload.pull_request.number;
