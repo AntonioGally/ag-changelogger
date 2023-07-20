@@ -1,0 +1,11 @@
+name: "Change logger"
+description: "Update the changelog by your PR informations"
+inputs:
+  changelogPath: # id of input
+    description: "Path to your changelog file"
+    required: true
+    default: "./CHANGELOG.md"
+  
+runs:
+  using: "node16"
+  main: "changeLogger.js"
