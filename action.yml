@@ -8,4 +8,4 @@ inputs:
   
 runs:
   using: "node16"
-  main: "changeLogger.js"
+  main: "./dist/index.js"
