@@ -9642,7 +9642,7 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName) {
+async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName, githubToken) {
 
     const logInfo = createLog(prData, tagName);
 
@@ -9673,6 +9673,8 @@ async function appendToChangelog(prData, tagName, changelogRelativePath, commitE
     // Add, commit, and push the changes
     execSync(`git config --global user.email "${commitEmail}"`, { stdio: 'inherit' });
     execSync(`git config --global user.name "${commitUserName}"`, { stdio: 'inherit' });
+    execSync(`git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ${githubToken}"`, { stdio: 'inherit' });
+
     execSync(`git add ${changelogPath}`, { stdio: 'inherit' });
     execSync(`git commit -m "docs: :memo: Updating changelog [${tagName}]"`, { stdio: 'inherit' });
     execSync(`git push -u origin ${prData.baseBranch}`, { stdio: 'inherit' });
@@ -9982,8 +9984,9 @@ async function main() {
     const changelogRelativePath = core.getInput("changelogPath");
     const commitEmail = core.getInput("commitEmail");
     const commitUserName = core.getInput("commitUserName");
+    const githubToken = core.getInput("githubToken");
 
-    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+    const octokit = new Octokit({ auth: githubToken });
 
     const prNumber = context.payload.pull_request.number;
     const owner = context.repo.owner;
@@ -9992,7 +9995,7 @@ async function main() {
     const prData = await getPRInformation(octokit, prNumber, owner, repo);
     const nextVersion = await getNewTagVersion(prData.title, octokit, owner, repo);
 
-    appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName);
+    appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName, githubToken);
 }
 
 main();

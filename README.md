@@ -35,6 +35,7 @@ jobs:
           commitEmail: ${{ secrets.GITHUB_EMAIL }}
           commitUserName: ${{ secrets.GITHUB_USERNAME }}
           changelogPath: ./CHANGELOG.md #Relative path
+          githubToken: ${{ secrets.GITHUB_TOKEN }} #Github default token
 ```
 
 ## Example
