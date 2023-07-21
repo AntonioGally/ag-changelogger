@@ -36,3 +36,14 @@ jobs:
           commitUserName: ${{ secrets.GITHUB_USERNAME }}
           changelogPath: ./CHANGELOG.md #Relative path
 ```
+
+## Example
+
+<img width="800" alt="image" src="https://github.com/AntonioGally/ag-changelogger/assets/68209906/b09547da-ad6d-4908-8223-20d1a3a53a3e">
+
+
+## Contacts
+
+ - antonio.gally@gmail.com
+ - https://www.linkedin.com/in/antonio-gally/
+ - https://github.com/AntonioGally
