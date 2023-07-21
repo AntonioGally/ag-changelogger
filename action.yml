@@ -5,6 +5,12 @@ inputs:
     description: "Path to your changelog file"
     required: true
     default: "./CHANGELOG.md"
+  commitEmail:
+    description: "Email that will be used to commit changes"
+    required: true
+  commitUserName:
+    description: "UserName that will be used to commit changes"
+    required: true
 
 runs:
   using: "node16"

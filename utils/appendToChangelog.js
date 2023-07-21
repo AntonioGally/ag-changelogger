@@ -22,7 +22,7 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName, changelogRelativePath) {
+async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName) {
 
     const logInfo = createLog(prData, tagName);
 
@@ -30,12 +30,12 @@ async function appendToChangelog(prData, tagName, changelogRelativePath) {
 
     const changelogPath = path.join(currentWorkingDir, changelogRelativePath);
 
-    console.log({ currentWorkingDir, changelogPath })
-
     // Check if the file exists
     fs.access(changelogPath, fs.constants.F_OK, (err) => {
         if (err) {
-            console.error(`CHANGELOG.md does not exist: ${err}`);
+            fs.writeFile(changelogPath, '', err => {
+                console.error(`CHANGELOG.md could not be created: ${err}`);
+            });
         } else {
             console.log(`Found CHANGELOG.md at: ${changelogPath}`);
         }
@@ -51,11 +51,11 @@ async function appendToChangelog(prData, tagName, changelogRelativePath) {
     fs.writeFileSync(changelogPath, newContent, { flag: "w" });
 
     // Add, commit, and push the changes
-    execSync('git config --global user.email "antonio.gally@gmail.com"', { stdio: 'inherit' });
-    execSync('git config --global user.name "AntonioGally"', { stdio: 'inherit' });
+    execSync(`git config --global user.email "${commitEmail}"`, { stdio: 'inherit' });
+    execSync(`git config --global user.name "${commitUserName}"`, { stdio: 'inherit' });
     execSync(`git add ${changelogPath}`, { stdio: 'inherit' });
     execSync(`git commit -m "docs: :memo: Updating changelog [${tagName}]"`, { stdio: 'inherit' });
-    execSync('git push', { stdio: 'inherit' });
+    execSync(`git push -u origin ${prData.baseBranch}`, { stdio: 'inherit' });
 }
 
 module.exports = {

@@ -27,7 +27,9 @@ async function getPRInformation(octokit, prNumber, owner, repo) {
     const prData = {
         title: prRequest.data.title,
         description: prRequest.data.body,
-        commits: commitsArray
+        commits: commitsArray,
+        baseBranch: prRequest.data.base.ref,
+        headBranch: prRequest.data.head.ref
     }
 
     return prData;
