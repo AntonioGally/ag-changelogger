@@ -33,7 +33,7 @@ async function appendToChangelog(prData, tagName, changelogRelativePath, commitE
     // Check if the file exists
     fs.access(changelogPath, fs.constants.F_OK, (err) => {
         if (err) {
-            fs.writeFile(changelogPath, '', err => {
+            fs.writeFileSync(changelogPath, '', err => {
                 console.error(`CHANGELOG.md could not be created: ${err}`);
             });
         } else {
