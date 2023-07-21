@@ -1,5 +1,9 @@
 name: "Change logger"
 description: "Update your changelog with your PR informations"
+author: AntonioGally
+branding:
+  icon: file-text
+  color: purple
 inputs:
   changelogPath: # id of input
     description: "Relative path to your changelog file"
