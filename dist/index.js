@@ -9673,7 +9673,7 @@ async function appendToChangelog(prData, tagName, changelogRelativePath, commitE
     // Add, commit, and push the changes
     execSync(`git config --global user.email "${commitEmail}"`, { stdio: 'inherit' });
     execSync(`git config --global user.name "${commitUserName}"`, { stdio: 'inherit' });
-    execSync(`git checkout ${prData.baseBranch}`, { stdio: 'inherit' });
+    execSync(`git remote add origin ${prData.repoRemote}`, { stdio: 'inherit' });
     execSync(`git pull`, { stdio: 'inherit' });
     execSync(`git add ${changelogPath}`, { stdio: 'inherit' });
     execSync(`git commit -m "docs: :memo: Updating changelog [${tagName}]"`, { stdio: 'inherit' });
@@ -9771,7 +9771,7 @@ async function getPRInformation(octokit, prNumber, owner, repo) {
         description: prRequest.data.body,
         commits: commitsArray,
         baseBranch: prRequest.data.base.ref,
-        headBranch: prRequest.data.head.ref
+        repoRemote: `${prRequest.data.base.repo.html_url}.git`
     }
 
     return prData;
