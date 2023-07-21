@@ -9642,7 +9642,7 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName, changelogRelativePath) {
+async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName) {
 
     const logInfo = createLog(prData, tagName);
 
@@ -9650,12 +9650,12 @@ async function appendToChangelog(prData, tagName, changelogRelativePath) {
 
     const changelogPath = path.join(currentWorkingDir, changelogRelativePath);
 
-    console.log({ currentWorkingDir, changelogPath })
-
     // Check if the file exists
     fs.access(changelogPath, fs.constants.F_OK, (err) => {
         if (err) {
-            console.error(`CHANGELOG.md does not exist: ${err}`);
+            fs.writeFile(changelogPath, '', err => {
+                console.error(`CHANGELOG.md could not be created: ${err}`);
+            });
         } else {
             console.log(`Found CHANGELOG.md at: ${changelogPath}`);
         }
@@ -9671,11 +9671,13 @@ async function appendToChangelog(prData, tagName, changelogRelativePath) {
     fs.writeFileSync(changelogPath, newContent, { flag: "w" });
 
     // Add, commit, and push the changes
-    execSync('git config --global user.email "antonio.gally@gmail.com"', { stdio: 'inherit' });
-    execSync('git config --global user.name "AntonioGally"', { stdio: 'inherit' });
+    execSync(`git config --global user.email "${commitEmail}"`, { stdio: 'inherit' });
+    execSync(`git config --global user.name "${commitUserName}"`, { stdio: 'inherit' });
+    execSync(`git checkout ${prData.baseBranch}`, { stdio: 'inherit' });
+    execSync(`git pull`, { stdio: 'inherit' });
     execSync(`git add ${changelogPath}`, { stdio: 'inherit' });
     execSync(`git commit -m "docs: :memo: Updating changelog [${tagName}]"`, { stdio: 'inherit' });
-    execSync('git push', { stdio: 'inherit' });
+    execSync(`git push -u origin ${prData.baseBranch}`, { stdio: 'inherit' });
 }
 
 module.exports = {
@@ -9767,7 +9769,9 @@ async function getPRInformation(octokit, prNumber, owner, repo) {
     const prData = {
         title: prRequest.data.title,
         description: prRequest.data.body,
-        commits: commitsArray
+        commits: commitsArray,
+        baseBranch: prRequest.data.base.ref,
+        headBranch: prRequest.data.head.ref
     }
 
     return prData;
@@ -9976,7 +9980,11 @@ const { appendToChangelog } = __nccwpck_require__(5948);
 
 async function main() {
     const context = github.context;
-    const changelogPath = core.getInput("changelogPath");
+
+    const changelogRelativePath = core.getInput("changelogPath");
+    const commitEmail = core.getInput("commitEmail");
+    const commitUserName = core.getInput("commitUserName");
+
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const prNumber = context.payload.pull_request.number;
@@ -9986,7 +9994,7 @@ async function main() {
     const prData = await getPRInformation(octokit, prNumber, owner, repo);
     const nextVersion = await getNewTagVersion(prData.title, octokit, owner, repo);
 
-    appendToChangelog(prData, nextVersion, changelogPath);
+    appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName);
 }
 
 main();
