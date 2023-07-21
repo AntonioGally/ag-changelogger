@@ -1,8 +1,8 @@
 name: "Change logger"
-description: "Update the changelog by your PR informations"
+description: "Update your changelog with your PR informations"
 inputs:
   changelogPath: # id of input
-    description: "Path to your changelog file"
+    description: "Relative path to your changelog file"
     required: true
     default: "./CHANGELOG.md"
   commitEmail:

@@ -9673,7 +9673,6 @@ async function appendToChangelog(prData, tagName, changelogRelativePath, commitE
     // Add, commit, and push the changes
     execSync(`git config --global user.email "${commitEmail}"`, { stdio: 'inherit' });
     execSync(`git config --global user.name "${commitUserName}"`, { stdio: 'inherit' });
-    // execSync(`git fetch origin ${prData.baseBranch}:${prData.baseBranch}`, { stdio: 'inherit' });
     execSync(`git add ${changelogPath}`, { stdio: 'inherit' });
     execSync(`git commit -m "docs: :memo: Updating changelog [${tagName}]"`, { stdio: 'inherit' });
     execSync(`git push -u origin ${prData.baseBranch}`, { stdio: 'inherit' });
