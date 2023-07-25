@@ -10,8 +10,8 @@ function generateDate() {
 
 function createLog(prData, tagName) {
     let body = `## ${tagName} (${generateDate()}) \n`;
-    body += `<p> <b> ${prData.title} </b> </p> \n`;
-    body += `<p> ${prData.description} </p> \n`;
+    body += `<p> <h3> ${prData.title} (#<a href="${prData.prUrl}">${prData.prNumber}</a>)</h3> </p> \n`;
+    body += `<p> ${prData.description || "- no description"} </p> \n`;
     body += `<details> <summary><h2>Commits</h2></summary> \n\n`
     body += `| Commit | Messsage | Author |\n`;
     body += `| -- | -- | -- |\n`;
@@ -22,7 +22,7 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName, githubToken) {
+async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName) {
 
     const logInfo = createLog(prData, tagName);
 

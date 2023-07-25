@@ -25,7 +25,7 @@ async function main() {
     const prData = await getPRInformation(octokit, prNumber, owner, repo);
     const nextVersion = await getNewTagVersion(prData.title, octokit, owner, repo);
 
-    appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName, githubToken);
+    appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName);
 }
 
 main();

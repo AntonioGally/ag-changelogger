@@ -29,7 +29,8 @@ async function getPRInformation(octokit, prNumber, owner, repo) {
         description: prRequest.data.body,
         commits: commitsArray,
         baseBranch: prRequest.data.base.ref,
-        repoRemote: `${prRequest.data.base.repo.html_url}.git`
+        prUrl: prRequest.data.url,
+        prNumber: prRequest.data.number
     }
 
     return prData;
