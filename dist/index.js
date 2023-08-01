@@ -9628,15 +9628,19 @@ function generateDate() {
     return date.toLocaleDateString("pt-BR", options);
 }
 
+function normalizeCommitMessage(commitMessage) {
+    return JSON.stringify(commitMessage).replace(/\\n/g, ' ');
+}
+
 function createLog(prData, tagName) {
     let body = `## ${tagName} (${generateDate()}) \n`;
-    body += `<p> <h3> ${prData.title} (<a href="${prData.prUrl}">#${prData.prNumber}</a>) </h3> </p> \n`;
-    body += `<p> ${prData.description || "- no description"} </p> \n`;
+    body += `<p> <h3> ${prData.title} (<a href="${prData.prUrl}">#${prData.prNumber}</a>) </h3> </p> \n\n`;
+    body += `${prData.description || "<h5> Empty description </h5>"} \n\n`;
     body += `<details> <summary><h2>Commits</h2></summary> \n\n`
     body += `| Commit | Messsage | Author |\n`;
     body += `| -- | -- | -- |\n`;
     prData.commits.forEach(data => {
-        body += `| <a href="${data.url}">${data.minSha}</a> | ${data.message} | <img width="30px" src="${data.authorImage}"/> \n`
+        body += `| <a href="${data.url}">${data.minSha}</a> | <p>${normalizeCommitMessage(data.message)}</p> | <img width="30px" src="${data.authorImage}"/> \n`
     })
     body += `\n</details>`
     return body;
