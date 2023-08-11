@@ -13,10 +13,11 @@ function normalizeCommitMessage(commitMessage) {
 }
 
 function createLog(prData, tagName) {
-    let body = `## ${tagName} (${generateDate()}) \n`;
+    let body = `<h2>${tagName}</h2> \n`;
+    body += `<small>${generateDate()}</small> \n`
     body += `<p> <h3> ${prData.title} (<a href="${prData.prUrl}">#${prData.prNumber}</a>) </h3> </p> \n\n`;
     body += `${prData.description || "<h5> Empty description </h5>"} \n\n`;
-    body += `<details> <summary><h2>Commits</h2></summary> \n\n`
+    body += `<details> <summary><h5>Commits</h5></summary> \n\n`
     body += `| Commit | Messsage | Author |\n`;
     body += `| -- | -- | -- |\n`;
     prData.commits.forEach(data => {
