@@ -1,20 +1,6 @@
-/**
- * Function to get the new tag version
- * @param {string} prTitle - The PR title
- * @param {any} octokit - octokit to do requests
- * @param {string} owner - repo's owner
- * @param {string} repo - repository name
- */
-async function getNewTagVersion(prTitle, octokit, owner, repo) {
-    let latestTag = "";
-    const tagRequest = await octokit.request('GET /repos/{owner}/{repo}/tags', {
-        owner, repo
-    })
-    if (tagRequest.data.length === 0) latestTag = "v0.1.0";
-    else latestTag = tagRequest.data[0].name;
-
-    let newVersion = latestTag;
-    let versionParts = latestTag.replace('v', '').split('.').map(Number);
+function getVersionByPrTitle(prTitle, startTag) {
+    let newVersion = startTag;
+    let versionParts = startTag.replace('v', '').split('.').map(Number);
 
     const patchRegex = /\bpatch\b/i;
     const minorRegex = /\bminor\b/i;
@@ -36,10 +22,30 @@ async function getNewTagVersion(prTitle, octokit, owner, repo) {
     }
     // Reconstruct the version number
     newVersion = 'v' + versionParts.join('.');
+    return newVersion;
+}
 
+
+/**
+ * Function to get the new tag version
+ * @param {string} prTitle - The PR title
+ * @param {any} octokit - octokit to do requests
+ * @param {string} owner - repo's owner
+ * @param {string} repo - repository name
+ */
+async function getNewTagVersion(prTitle, octokit, owner, repo) {
+    let latestTag = "";
+    const tagRequest = await octokit.request('GET /repos/{owner}/{repo}/tags', {
+        owner, repo
+    })
+    if (tagRequest.data.length === 0) latestTag = "v0.1.0";
+    else latestTag = tagRequest.data[0].name;
+
+    let newVersion = getVersionByPrTitle(prTitle, latestTag);
     return newVersion;
 }
 
 module.exports = {
-    getNewTagVersion
+    getNewTagVersion,
+    getVersionByPrTitle
 }

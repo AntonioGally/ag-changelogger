@@ -2,8 +2,8 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
 
-function generateDate() {
-    const date = new Date();
+function generateDate(dateString) {
+    const date = new Date(dateString);
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString("pt-BR", options);
 }
@@ -14,7 +14,7 @@ function normalizeCommitMessage(commitMessage) {
 
 function createLog(prData, tagName) {
     let body = `<h2>${tagName}</h2> \n`;
-    body += `<small>${generateDate()}</small> \n`
+    body += `<small>${generateDate(prData.prCreatedDate)}</small> \n`
     body += `<p> <h3> ${prData.title} (<a href="${prData.prUrl}">#${prData.prNumber}</a>) </h3> </p> \n\n`;
     body += `${prData.description || "<h5> Empty description </h5>"} \n\n`;
     body += `<details> <summary><h5>Commits</h5></summary> \n\n`
@@ -27,10 +27,7 @@ function createLog(prData, tagName) {
     return body;
 }
 
-async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName) {
-
-    const logInfo = createLog(prData, tagName);
-
+function writeLog(logInfo, changelogRelativePath) {
     const currentWorkingDir = process.cwd();
 
     const changelogPath = path.join(currentWorkingDir, changelogRelativePath);
@@ -54,6 +51,13 @@ async function appendToChangelog(prData, tagName, changelogRelativePath, commitE
 
     // Write the new content back to the file
     fs.writeFileSync(changelogPath, newContent, { flag: "w" });
+}
+
+async function appendToChangelog(prData, tagName, changelogRelativePath, commitEmail, commitUserName) {
+
+    const logInfo = createLog(prData, tagName);
+
+    writeLog(logInfo, changelogRelativePath);
 
     // Add, commit, and push the changes
     execSync(`git config --global user.email "${commitEmail}"`, { stdio: 'inherit' });
@@ -65,5 +69,7 @@ async function appendToChangelog(prData, tagName, changelogRelativePath, commitE
 }
 
 module.exports = {
-    appendToChangelog
+    appendToChangelog,
+    createLog,
+    writeLog
 }
