@@ -15,6 +15,10 @@ inputs:
   commitUserName:
     description: "UserName that will be used to commit changes"
     required: true
+  shouldCreateNewTag:
+    description: "Should create a new tag"
+    required: false
+    default: "true"
   githubToken:
     description: "Github default token"
     required: true

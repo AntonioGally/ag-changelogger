@@ -21,7 +21,8 @@ async function getPRInformation(octokit, prNumber, owner, repo) {
         url: commit.html_url,
         minSha: commit.sha.substring(0, 7),
         message: commit.commit.message,
-        authorImage: commit.author.avatar_url
+        authorImage: commit.author.avatar_url,
+        sha: commit.sha
     }));
 
     const prData = {

@@ -14,6 +14,7 @@ async function main() {
     const changelogRelativePath = core.getInput("changelogPath");
     const commitEmail = core.getInput("commitEmail");
     const commitUserName = core.getInput("commitUserName");
+    const shouldCreateNewTag = core.getInput("shouldCreateNewTag");
     const githubToken = core.getInput("githubToken");
 
     const octokit = new Octokit({ auth: githubToken });
@@ -24,6 +25,17 @@ async function main() {
 
     const prData = await getPRInformation(octokit, prNumber, owner, repo);
     const nextVersion = await getNewTagVersion(prData.title, octokit, owner, repo);
+
+    if (shouldCreateNewTag === "true") {
+        await octokit.request('POST /repos/{owner}/{repo}/git/tags', {
+            owner,
+            repo,
+            tag: nextVersion,
+            message: prData.title,
+            object: prData.commits.at(-1).sha,
+            type: 'commit'
+        });
+    }
 
     appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName);
 }
