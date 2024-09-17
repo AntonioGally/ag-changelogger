@@ -6,6 +6,7 @@ const core = require('@actions/core');
 const { getPRInformation } = require('./utils/getPRInformation');
 const { getNewTagVersion } = require('./utils/getLatestTag');
 const { appendToChangelog } = require('./utils/appendToChangelog');
+const { createTag } = require('./utils/createTag');
 
 
 async function main() {
@@ -27,14 +28,7 @@ async function main() {
     const nextVersion = await getNewTagVersion(prData.title, octokit, owner, repo);
 
     if (shouldCreateNewTag === "true") {
-        await octokit.request('POST /repos/{owner}/{repo}/git/tags', {
-            owner,
-            repo,
-            tag: nextVersion,
-            message: prData.title,
-            object: prData.commits.at(-1).sha,
-            type: 'commit'
-        });
+        await createTag(octokit, prData, owner, repo, nextVersion);
     }
 
     appendToChangelog(prData, nextVersion, changelogRelativePath, commitEmail, commitUserName);
