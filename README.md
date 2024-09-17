@@ -1,67 +1,94 @@
-## GitHub Changelog Updater Action
+# GitHub Changelog Updater Action
 
 This action automatically updates the `CHANGELOG.md` file in your repository whenever a new pull request is merged. It uses the your Pull Request as data and append it to the changelog. The data that the action gets in yout repository is: 
 `title`, `body`, `commits`, `baseBranch`, `prUrl`, `createdAt`, `prNumber`.
 
-### Inputs
+## Inputs
 
-| **Name**           | Type   | Description                                                                                               | Required |
-|--------------------|--------|-----------------------------------------------------------------------------------------------------------|----------|
-| **commitEmail**    | string | The email used for committing the updated CHANGELOG.md.                                                   | true     |
-| **commitUserName** | string | The username used for committing the updated CHANGELOG.md.                                                | true     |
-| **changelogPath**  | string | Relative path to your changelog file, starting from the root of your project. Default is "./CHANGELOG.md" | false    |
-| **githubToken**    | string | GH token that will provide the permissions to read and write in your repository                           | true     |
+| **Name**                  | Type   | Description                                                                                               | Required |
+|---------------------------|--------|-----------------------------------------------------------------------------------------------------------|----------|
+| **commitEmail**           | string | The email used for committing the updated CHANGELOG.md.                                                   | true     |
+| **commitUserName**        | string | The username used for committing the updated CHANGELOG.md.                                                | true     |
+| **changelogPath**         | string | Relative path to your changelog file, starting from the root of your project. Default is "./CHANGELOG.md" | false    |
+| **githubToken**           | string | GH token that will provide the permissions to read and write in your repository                           | true     |
+| **shouldCreateNewTag**    | string | This action should create a new tag when loggin changes?                                                  | false    |
 
 
-### Usage
-Include this action in your workflow file. Here is an example:
+## Usage
+
+### Include this action in your `.github/workflows/my-action.yaml` file. Here is an example:
 
 ```yml
+name: Updating Changelog
 on:
   pull_request:
-    types: [closed] #only closed pr
     branches:
-      - main #trigger this action if the pr is related with this branch
-
+      - master # default branch
+    types:
+      - closed
 jobs:
-  update_changelog:
+  updating-change-log:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: master # checkout in default branch
 
       - name: Update Changelog
+        id: action
         uses: AntonioGally/ag-changelogger/@main
         with:
-          commitEmail: antonio.gally@gmail.com
+          changelogPath: ./CHANGELOG.md
           commitUserName: AntonioGally
-          changelogPath: ./CHANGELOG.md #Relative path
-          githubToken: ${{ secrets.GITHUB_TOKEN }} #Github default token, PATs are recomended
+          commitEmail: antonio.gally@gmail.com
+          githubToken: ${{ secrets.MY_CHANGELOG_PAT }}
+          shouldCreateNewTag: true
 ```
 
-### Observations
- - 🚨 Your repository must have another script/action that creates the tags. This action doesn't create any tags it self, just read the last created tag and increase one version for loggin the changes, expecting that other script will create the new tag **using the same versioning logic** (with major, minor and patch regex). The function that do that can be finded in `./utils/getLatestTag` and is called `getVersionByPrTitle`.
- - The changelog file must exist in the repository's main branch. 
+### Create a PAT to this action
+
+They can be found in [GitHub settings](https://github.com/settings/tokens). We need `repo`, `workflow` and `user` permissions
+
+Here's the [official docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+
+
+### Workflow permissions
+
+You can find this configuration under your repo's settings. In you sidebar, navigate to `Actions` > `General`
+
+<img src='./assets/workflow_permissions.png' width='500' />
+
+### Changelog file
+
+Create a initial changelog file that matches with the `relativePath`. By default, this action will try to find CHANGELOG.md in repo's root.
+
+
+## Observations
+ - 🚨 The changelog file must exist in the repository's main branch. 
  - If the pr's title doesn't contains major, minor or patch name, the script will increase the patch number of the version.
 
-### Example
+## Example
 
 <img width="800" alt="image" src="https://github.com/AntonioGally/ag-changelogger/assets/68209906/b09547da-ad6d-4908-8223-20d1a3a53a3e">
 
-
-### Contributing
+## Contributing
 Just send a nice PR that I'll review it with love :D Or just email me as well I'll read
 
-### Under the hood
-I'm using ncc build to generate... a build, with all the node_modules that the script need to be executed. I need to do this because I wanted to minimize the effort to run this actions in other repositories. I could make a sh executable file and install the dependencies and stuff, but I wont :D.
-The script is simple, the `changeLogger.js` is the entrancy to my dirty code files. It will start getting all the inputs that you pass by workflow and will create a authenticated connection with github api. Then, will first get the pr information, including the commits that are part of the PR. After that, the script will get the next tag version, starting from the last tag that you have in your repo. If you don't have any, the first tag will be `v0.1.0`. After get the next version, the script will gatter all the informations into one big string and will try to find your changelog file. After finding the file, the script concats the new big string with the old string in your changelog. With this big and updated string, the script will commit the changes using `execSync` function from `child_process` and done, you have a nice changelog now!
+## Under the hood
 
-### Best practices
+This project uses ncc to generate a build that bundles all necessary node_modules for the script's execution. The reason behind this approach is to minimize the effort required to run these actions across different repositories. While I could have created a shell script to install dependencies and handle everything manually, I opted for this streamlined solution instead.
+
+The core of the project is a script called changeLogger.js. This script starts by receiving inputs from the workflow and establishing an authenticated connection to the GitHub API. It first retrieves information about the pull request (PR), including all associated commits.
+
+Next, the script determines the next version tag by starting from the latest tag in your repository. If no tags are found, the script will default to v0.1.0. After calculating the next version, it gathers all relevant information into a comprehensive changelog entry.
+
+The script then locates your existing changelog file and appends the newly generated changelog entry. Once the file is updated, it commits the changes using the execSync function from the child_process module. And just like that, your changelog is up to date!
+
+## Best practices
 Try to fill the description as much as you can, put images and texts that describe directly what was your change in that PR. In a long run, will help a lot in the changelog file, and will be much nicier to see :D
-### Contacts
+
+## Contacts
 
  - antonio.gally@gmail.com
  - https://www.linkedin.com/in/antonio-gally/
